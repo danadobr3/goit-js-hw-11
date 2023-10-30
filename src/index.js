@@ -7,6 +7,7 @@ const refs = {
   gallery: document.querySelector('.gallery'),
   loadMoreBtn: document.querySelector('.load-more'),
 };
+
 let isShown = 0;
 const newsApiSearch = new NewsApiSearch();
 
@@ -19,14 +20,12 @@ const options = {
   threshold: 0.3,
 };
 
-const watcher = new Watcher(onLoadMore, options);
-
-function onSearch(element) {
-    element.preventDefault();
+function onSearch(event) {
+    event.preventDefault();
     
     refs.gallery.innerHTML = '';
     newsApiSearch.query =
-        element.currentTarget.elements.searchQuery.value.trim();
+        event.currentTarget.elements.searchQuery.value.trim();
     newsApiSearch.resetPage();
 
     if (newsApiSearch.query === '') {
@@ -35,8 +34,8 @@ function onSearch(element) {
     }
 
     isShown = 0;
-  fetchGallery();
-  onRenderGallery(hits);
+    fetchGallery();
+    onRenderGallery(hits);
 }
 
 function onLoadMore() {
