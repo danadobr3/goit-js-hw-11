@@ -22,7 +22,7 @@ const options = {
 
 const observer = new IntersectionObserver(onLoadMore, options);
 
-function onSearch(event) {
+async function onSearch(event) {
     event.preventDefault();
     
     refs.gallery.innerHTML = '';
@@ -35,13 +35,8 @@ function onSearch(event) {
     }
 
     isShown = 0;
-    fetchGallery();
-    onRenderGallery(hits);
-}
-
-function onLoadMore() {
-  newsApiSearch.incrementPage();
-  fetchGallery();
+    const result = await fetchGallery();
+    onRenderGallery(result.hits);
 }
 
 async function fetchGallery() {
@@ -54,7 +49,7 @@ async function fetchGallery() {
     if (!hits.length) {
         Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
         refs.loadMoreBtn.classList.add('is-hidden');
-        return;
+        return result;
     }
     
     onRenderGallery(hits);
@@ -68,13 +63,19 @@ async function fetchGallery() {
     if (isShown >= totalHits) {
         Notify.info("We're sorry, but you've reached the end of search results.");
     }
+    return result;
+}
 
+function onLoadMore() {
+  newsApiSearch.incrementPage();
+  fetchGallery().then(result => {
     const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
 
     window.scrollBy({
         top: cardHeight * 2,
         behavior: "smooth",
     });
+  });
 }
 
 function onRenderGallery(elements) {
@@ -98,7 +99,7 @@ function onRenderGallery(elements) {
         <b>Likes</b>
         ${likes}
       </p>
-      <p class "info-item">
+      <p class="info-item">
         <b>Views</b>
         ${views}
       </p>
