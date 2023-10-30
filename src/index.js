@@ -26,8 +26,7 @@ function onSearch(event) {
     event.preventDefault();
     
     refs.gallery.innerHTML = '';
-    newsApiSearch.query =
-        event.currentTarget.elements.searchQuery.value.trim();
+    newsApiSearch.query = event.currentTarget.elements.searchQuery.value.trim();
     newsApiSearch.resetPage();
 
     if (newsApiSearch.query === '') {
@@ -49,28 +48,33 @@ async function fetchGallery() {
     refs.loadMoreBtn.classList.add('is-hidden');
     
     const result = await newsApiSearch.fetchGallery();
-    const { hits, total } = result;
+    const { hits, totalHits } = result;
     isShown += hits.length;
     
-     if (!hits.length) {
-    Notify.failure(
-      `Sorry, there are no images matching your search query. Please try again.`
-    );
-    refs.loadMoreBtn.classList.add('is-hidden');
-    return;
-     }
+    if (!hits.length) {
+        Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
+        refs.loadMoreBtn.classList.add('is-hidden');
+        return;
+    }
     
     onRenderGallery(hits);
-  isShown += hits.length;
+    isShown += hits.length;
 
-  if (isShown < total) {
-    Notify.success(`Hooray! We found ${total} images !!!`);
-    refs.loadMoreBtn.classList.remove('is-hidden');
-  }
+    if (isShown < totalHits) {
+        Notify.success(`Hooray! We found ${totalHits} images !!!`);
+        refs.loadMoreBtn.classList.remove('is-hidden');
+    }
 
-     if (isShown >= total) {
-    Notify.info(`We're sorry, but you've reached the end of search results.`);
-  }
+    if (isShown >= totalHits) {
+        Notify.info("We're sorry, but you've reached the end of search results.");
+    }
+
+    const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+        top: cardHeight * 2,
+        behavior: "smooth",
+    });
 }
 
 function onRenderGallery(elements) {
@@ -94,7 +98,7 @@ function onRenderGallery(elements) {
         <b>Likes</b>
         ${likes}
       </p>
-      <p class="info-item">
+      <p class "info-item">
         <b>Views</b>
         ${views}
       </p>
