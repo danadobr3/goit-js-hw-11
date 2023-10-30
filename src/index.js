@@ -20,6 +20,8 @@ const options = {
   threshold: 0.3,
 };
 
+const observer = new IntersectionObserver(onLoadMore, options);
+
 function onSearch(event) {
     event.preventDefault();
     

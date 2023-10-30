@@ -120,7 +120,7 @@ body {
 }
 
 .search-form_button:hover, .search-form_button:focus {
-        background-color: rgba(199, 170, 139, 1);
+        background-color: rgba(173, 216, 230, 1);
     }
 
 ul {
@@ -157,7 +157,7 @@ p {
     box-shadow: 0px 0px 5px 2px rgba(0, 4, 56, 0.5);
     border-radius: 8px;
     overflow: hidden;
-    background-color: rgba(255, 255, 0, 0.5);
+    background-color: rgba(10, 186, 181, 0.5);
 }
 
 .photo-card:hover, .photo-card:focus {
@@ -202,7 +202,7 @@ p {
 
 .load-more:hover, .load-more:focus {
         color: black;
-        background-color: rgba(199, 170, 139, 1);
+        background-color: rgba(173, 216, 230, 1);
     }
 
 .load-more.is-hidden {
