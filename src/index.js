@@ -117,5 +117,6 @@ function onRenderGallery(elements) {
     )
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markup);
-  lightbox.refresh();
+    const updatedLightbox = new SimpleLightbox('.gallery a');
+    updatedLightbox.refresh();
 }
