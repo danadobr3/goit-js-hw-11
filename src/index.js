@@ -2,6 +2,8 @@ import NewsApiSearch from './js/api-search';
 import { lightbox } from './js/lightbox';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
+initLightbox();
+
 const refs = {
   searchForm: document.querySelector('.search-form'),
   gallery: document.querySelector('.gallery'),
@@ -75,12 +77,7 @@ function onLoadMore() {
         top: cardHeight * 2,
         behavior: "smooth",
     });
-      lightbox.destroy(); // Знищуємо попередній lightbox
-    lightbox = new SimpleLightbox('.photo-card a', {
-      captions: true,
-      captionsData: 'alt',
-      captionDelay: 250,
-    });
+      initLightbox();
   });
 }
 
@@ -126,3 +123,6 @@ function onRenderGallery(elements) {
   lightbox.refresh();
 }
 
+function initLightbox() {
+  lightbox.refresh();
+}
