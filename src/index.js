@@ -75,7 +75,12 @@ function onLoadMore() {
         top: cardHeight * 2,
         behavior: "smooth",
     });
-      lightbox.refresh();
+      lightbox.destroy(); // Знищуємо попередній lightbox
+    lightbox = new SimpleLightbox('.photo-card a', {
+      captions: true,
+      captionsData: 'alt',
+      captionDelay: 250,
+    });
   });
 }
 
