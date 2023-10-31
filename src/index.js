@@ -12,7 +12,6 @@ const refs = {
 
 let isShown = 0;
 const newsApiSearch = new NewsApiSearch();
-let hits = null; 
 
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
@@ -25,7 +24,7 @@ const options = {
 
 const observer = new IntersectionObserver(onLoadMore, options);
 
- function onSearch(event) {
+ async function onSearch(event) {
     event.preventDefault();
     
     refs.gallery.innerHTML = '';
@@ -38,8 +37,8 @@ const observer = new IntersectionObserver(onLoadMore, options);
     }
 
     isShown = 0;
-    fetchGallery();
-  onRenderGallery();
+    const result = await fetchGallery();
+    onRenderGallery(result.hits);
 }
 
 async function fetchGallery() {
