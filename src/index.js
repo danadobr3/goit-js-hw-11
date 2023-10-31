@@ -75,6 +75,7 @@ function onLoadMore() {
         top: cardHeight * 2,
         behavior: "smooth",
     });
+      lightbox.refresh();
   });
 }
 
@@ -117,6 +118,6 @@ function onRenderGallery(elements) {
     )
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markup);
-    const updatedLightbox = new SimpleLightbox('.gallery a');
-    updatedLightbox.refresh();
+  lightbox.refresh();
 }
+
