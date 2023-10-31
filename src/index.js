@@ -37,21 +37,15 @@ const observer = new IntersectionObserver(onLoadMore, options);
     }
 
     isShown = 0;
-    fetchGallery();
+  fetchGallery();
   onRenderGallery(hits);
- }
-refs.searchForm.addEventListener('submit', (event) => {
-    onSearch(event, hits);
-});
-    
-let hits = [];
+}
 
-async function fetchGallery(hits) {
+async function fetchGallery() {
     refs.loadMoreBtn.classList.add('is-hidden');
     
     const result = await newsApiSearch.fetchGallery();
-    hits = result.hits;
-    const { totalHits } = result;
+    const { hits, totalHits } = result;
     isShown += hits.length;
     
     if (!hits.length) {
@@ -125,10 +119,10 @@ function onRenderGallery(elements) {
       }
     )
     .join('');
-  refs.gallery.insertAdjacentHTML('beforeend', markup);
+  refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
   lightbox.refresh();
 }
 
 function initLightbox() {
   lightbox.refresh();
-}
+} 
