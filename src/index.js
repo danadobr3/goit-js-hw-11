@@ -24,7 +24,7 @@ const options = {
 
 const observer = new IntersectionObserver(onLoadMore, options);
 
- async function onSearch(event) {
+ function onSearch(event) {
     event.preventDefault();
     
     refs.gallery.innerHTML = '';
@@ -37,15 +37,21 @@ const observer = new IntersectionObserver(onLoadMore, options);
     }
 
     isShown = 0;
-    const result = await fetchGallery();
-    onRenderGallery(result.hits);
-}
+    fetchGallery();
+  onRenderGallery(hits);
+ }
+refs.searchForm.addEventListener('submit', (event) => {
+    onSearch(event, hits);
+});
+    
+let hits = [];
 
-async function fetchGallery() {
+async function fetchGallery(hits) {
     refs.loadMoreBtn.classList.add('is-hidden');
     
     const result = await newsApiSearch.fetchGallery();
-    const { hits, totalHits } = result;
+    hits = result.hits;
+    const { totalHits } = result;
     isShown += hits.length;
     
     if (!hits.length) {
