@@ -37,8 +37,9 @@ const observer = new IntersectionObserver(onLoadMore, options);
     }
 
     isShown = 0;
-    fetchGallery();
-  onRenderGallery(result.hits);
+    fetchGallery().then(result => {
+    onRenderGallery(result.hits);
+  });
 }
 
 async function fetchGallery() {
