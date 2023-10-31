@@ -24,7 +24,7 @@ const options = {
 
 const observer = new IntersectionObserver(onLoadMore, options);
 
-async function onSearch(event) {
+ function onSearch(event) {
     event.preventDefault();
     
     refs.gallery.innerHTML = '';
@@ -37,8 +37,8 @@ async function onSearch(event) {
     }
 
     isShown = 0;
-    const result = await fetchGallery();
-    onRenderGallery(result.hits);
+    fetchGallery();
+  onRenderGallery(result.hits);
 }
 
 async function fetchGallery() {
