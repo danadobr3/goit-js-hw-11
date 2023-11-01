@@ -2,6 +2,7 @@ import NewsApiSearch from './js/api-search';
 import { lightbox } from './js/lightbox';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
+let hits = [];
 initLightbox();
 
 const refs = {
@@ -45,7 +46,9 @@ async function fetchGallery() {
     refs.loadMoreBtn.classList.add('is-hidden');
     
     const result = await newsApiSearch.fetchGallery();
-    const { hits, totalHits } = result;
+    const { totalHits } = result;
+    hits = result.hits;
+
     isShown += hits.length;
     
     if (!hits.length) {
@@ -119,7 +122,7 @@ function onRenderGallery(elements) {
       }
     )
     .join('');
-  refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
+  refs.gallery.insertAdjacentHTML('beforeend', markup);
   lightbox.refresh();
 }
 
