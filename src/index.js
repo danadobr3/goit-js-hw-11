@@ -23,7 +23,7 @@ const options = {
   threshold: 0.3,
 };
 
-const observer = new IntersectionObserver(onLoadMore, options);
+
 
  function onSearch(event) {
     event.preventDefault();
@@ -45,16 +45,18 @@ const observer = new IntersectionObserver(onLoadMore, options);
 async function fetchGallery() {
     refs.loadMoreBtn.classList.add('is-hidden');
     
-    const result = await newsApiSearch.fetchGallery();
-    const { totalHits } = result;
-    hits = result.hits;
+    const firstPage = await newsApiSearch.fetchGallery();
+  const secondPage = await newsApiSearch.fetchGallery();
 
+  const totalHits = firstPage.totalHits + secondPage.totalHits;
+    hits = [...firstPage.hits, ...secondPage.hits];
+  
     isShown += hits.length;
     
     if (!hits.length) {
         Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
         refs.loadMoreBtn.classList.add('is-hidden');
-        return result;
+        return { totalHits: 0, hits: [] };
     }
     
     onRenderGallery(hits);
@@ -68,12 +70,12 @@ async function fetchGallery() {
     if (isShown >= totalHits) {
         Notify.info("We're sorry, but you've reached the end of search results.");
     }
-    return result;
+    return { totalHits, hits };
 }
 
 function onLoadMore() {
   newsApiSearch.incrementPage();
-  fetchGallery().then(result => {
+  fetchGallery().then(() => {
     const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
 
     window.scrollBy({
@@ -128,4 +130,4 @@ function onRenderGallery(elements) {
 
 function initLightbox() {
   lightbox.refresh();
-} 
+}
