@@ -23,7 +23,7 @@ const options = {
   threshold: 0.3,
 };
 
-
+const observer = new IntersectionObserver(onLoadMore, options);
 
  function onSearch(event) {
     event.preventDefault();
@@ -45,18 +45,16 @@ const options = {
 async function fetchGallery() {
     refs.loadMoreBtn.classList.add('is-hidden');
     
-    const firstPage = await newsApiSearch.fetchGallery();
-  const secondPage = await newsApiSearch.fetchGallery();
+    const result = await newsApiSearch.fetchGallery();
+    const { totalHits } = result;
+    hits = result.hits;
 
-  const totalHits = firstPage.totalHits + secondPage.totalHits;
-    hits = [...firstPage.hits, ...secondPage.hits];
-  
     isShown += hits.length;
     
     if (!hits.length) {
         Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
         refs.loadMoreBtn.classList.add('is-hidden');
-        return { totalHits: 0, hits: [] };
+        return { page: 1, totalPages: 1, hits: [] };
     }
     
     onRenderGallery(hits);
@@ -64,24 +62,33 @@ async function fetchGallery() {
 
     if (isShown < totalHits) {
         Notify.success(`Hooray! We found ${totalHits} images !!!`);
+       if (result.page < result.totalPages) {
         refs.loadMoreBtn.classList.remove('is-hidden');
+    } else {
+        refs.loadMoreBtn.classList.add('is-hidden');
+    }
     }
 
     if (isShown >= totalHits) {
         Notify.info("We're sorry, but you've reached the end of search results.");
     }
-    return { totalHits, hits };
+    return result;
 }
 
 function onLoadMore() {
   newsApiSearch.incrementPage();
-  fetchGallery().then(() => {
+  fetchGallery().then(result => {
     const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
 
     window.scrollBy({
         top: cardHeight * 2,
         behavior: "smooth",
     });
+      if (result.page < result.totalPages) {
+      refs.loadMoreBtn.classList.remove('is-hidden');
+    } else {
+      refs.loadMoreBtn.classList.add('is-hidden');
+    }
       initLightbox();
   });
 }
