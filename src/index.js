@@ -49,26 +49,24 @@ async function fetchGallery() {
     const { totalHits } = result;
     hits = result.hits;
 
-    isShown += hits.length;
+    
     
     if (!hits.length) {
         Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
         refs.loadMoreBtn.classList.add('is-hidden');
-        return result;
+        return;
     }
     
     onRenderGallery(hits);
-    isShown += hits.length;
 
-    if (isShown < totalHits) {
-        Notify.success(`Hooray! We found ${totalHits} images !!!`);
-        refs.loadMoreBtn.classList.remove('is-hidden');
-    }
 
-    if (isShown >= totalHits) {
-        Notify.info("We're sorry, but you've reached the end of search results.");
-    }
-    return result;
+   if (isShown < totalHits) {
+    Notify.success(`Hooray! We found ${totalHits} images !!!`);
+    refs.loadMoreBtn.classList.remove('is-hidden');
+  } else {
+    Notify.info("We're sorry, but you've reached the end of search results.");
+   }
+    
 }
 
 function onLoadMore() {
@@ -126,6 +124,3 @@ function onRenderGallery(elements) {
   lightbox.refresh();
 }
 
-function initLightbox() {
-  lightbox.refresh();
-}
