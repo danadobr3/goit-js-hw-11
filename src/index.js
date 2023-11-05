@@ -12,10 +12,11 @@ const refs = {
 };
 
 let isShown = 0;
-
 const newsApiSearch = new NewsApiSearch();
 
 refs.searchForm.addEventListener('submit', onSearch);
+
+refs.loadMoreBtn.addEventListener('click', loadMoreImages);
 
 const options = {
   rootMargin: '50px',
@@ -23,28 +24,7 @@ const options = {
   threshold: 0.3,
 };
 
-const observer = new IntersectionObserver(handleIntersection, options);
-
-function observeLoadMoreButton() {
-  observer.observe(refs.loadMoreBtn);
-}
-
-function unobserveLoadMoreButton() {
-  observer.unobserve(refs.loadMoreBtn);
-}
-
-function handleIntersection(entries) {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
- 
-      loadMoreImages();
-      
-      if (isShown >= totalHits) {
-        unobserveLoadMoreButton();
-      }
-    }
-  });
-}
+const observer = new IntersectionObserver(loadMoreImages, options);
 
 async function onSearch(event) {
   event.preventDefault();
@@ -62,8 +42,6 @@ async function onSearch(event) {
   fetchGallery();
   onRenderGallery(hits);
   
-  
-  observeLoadMoreButton();
 }
 
 async function fetchGallery() {
@@ -91,30 +69,28 @@ async function fetchGallery() {
 
   if (isShown >= totalHits) {
     Notify.info("We're sorry, but you've reached the end of search results.");
-    
-    unobserveLoadMoreButton();
   }
   return result;
 }
 
 async function loadMoreImages() {
-     
   const result = await fetchGallery();
   const { totalHits } = result;
 
-
   if (isShown < totalHits) {
     refs.loadMoreBtn.classList.add('is-hidden');
-    newsApiSearch.incrementPage();
     isShown += result.hits.length;
     if (isShown < totalHits) {
       refs.loadMoreBtn.classList.remove('is-hidden');
     }
 
+    newsApiSearch.incrementPage(); 
+
     const { height: cardHeight } = document
       .querySelector(".gallery")
-      .lastElementChild.getBoundingClientRect();
+      .firstElementChild.getBoundingClientRect();
 
+    
     window.scrollBy({
       top: cardHeight * 2,
       behavior: "smooth",
