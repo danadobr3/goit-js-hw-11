@@ -12,20 +12,12 @@ const refs = {
 };
 
 let isShown = 0;
-let isLoading = false; 
+let isLoading = false;
 const newsApiSearch = new NewsApiSearch();
 
 refs.searchForm.addEventListener('submit', onSearch);
 
 refs.loadMoreBtn.addEventListener('click', loadMoreImages);
-
-const options = {
-  rootMargin: '50px',
-  root: null,
-  threshold: 0.3,
-};
-
-const observer = new IntersectionObserver(loadMoreImages, options);
 
 async function onSearch(event) {
   event.preventDefault();
@@ -42,7 +34,6 @@ async function onSearch(event) {
   isShown = 0;
   fetchGallery();
   onRenderGallery(hits);
-
 }
 
 async function fetchGallery() {
@@ -94,7 +85,7 @@ async function loadMoreImages() {
 
     const { height: cardHeight } = document
       .querySelector(".gallery")
-      .firstElementChild.getBoundingClientRect();
+      .lastElementChild.getBoundingClientRect();
 
     window.scrollBy({
       top: cardHeight * 2,
