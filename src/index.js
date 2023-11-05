@@ -15,7 +15,8 @@ let isShown = 0;
 const newsApiSearch = new NewsApiSearch();
 
 refs.searchForm.addEventListener('submit', onSearch);
-refs.loadMoreBtn.addEventListener('click', onLoadMore);
+
+refs.loadMoreBtn.addEventListener('click', loadMoreImages);
 
 const options = {
   rootMargin: '50px',
@@ -23,68 +24,78 @@ const options = {
   threshold: 0.3,
 };
 
+const observer = new IntersectionObserver(loadMoreImages, options);
 
+async function onSearch(event) {
+  event.preventDefault();
 
- function onSearch(event) {
-    event.preventDefault();
-    
-    refs.gallery.innerHTML = '';
-    newsApiSearch.query = event.currentTarget.elements.searchQuery.value.trim();
-    newsApiSearch.resetPage();
+  refs.gallery.innerHTML = '';
+  newsApiSearch.query = event.currentTarget.elements.searchQuery.value.trim();
+  newsApiSearch.resetPage();
 
-    if (newsApiSearch.query === '') {
-        Notify.failure(`Please, fill the main field`);
-        return;
-    }
+  if (newsApiSearch.query === '') {
+    Notify.failure(`Please, fill the main field`);
+    return;
+  }
 
-    isShown = 0;
+  isShown = 0;
   fetchGallery();
-   onRenderGallery(hits);
-   
+  onRenderGallery(hits);
+  
 }
 
 async function fetchGallery() {
+  refs.loadMoreBtn.classList.add('is-hidden');
+
+  const result = await newsApiSearch.fetchGallery();
+  const { totalHits } = result; 
+  hits = result.hits;
+
+  isShown += hits.length;
+
+  if (!hits.length) {
+    Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
     refs.loadMoreBtn.classList.add('is-hidden');
-    
-    const result = await newsApiSearch.fetchGallery();
-    const { totalHits } = result;
-    hits = result.hits;
-
-    isShown += hits.length;
-    
-    if (!hits.length) {
-        Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
-        refs.loadMoreBtn.classList.add('is-hidden');
-        return result;
-    }
-    
-    onRenderGallery(hits);
-    isShown += hits.length;
-
-    if (isShown < totalHits) {
-        Notify.success(`Hooray! We found ${totalHits} images !!!`);
-        refs.loadMoreBtn.classList.remove('is-hidden');
-    }
-
-    if (isShown >= totalHits) {
-        Notify.info("We're sorry, but you've reached the end of search results.");
-    }
     return result;
+  }
+
+  onRenderGallery(hits);
+  isShown += hits.length;
+
+  if (isShown < totalHits) {
+    Notify.success(`Hooray! We found ${totalHits} images !!!`);
+    refs.loadMoreBtn.classList.remove('is-hidden');
+  }
+
+  if (isShown >= totalHits) {
+    Notify.info("We're sorry, but you've reached the end of search results.");
+  }
+  return result;
 }
 
-function onLoadMore() {
-  newsApiSearch.incrementPage();
-  fetchGallery().then(() => {
-    onRenderGallery(hits);
-    const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
+async function loadMoreImages() {
+  const result = await fetchGallery();
+  const { totalHits } = result;
+
+  if (isShown < totalHits) {
+    refs.loadMoreBtn.classList.add('is-hidden');
+    newsApiSearch.incrementPage();
+    isShown += result.hits.length;
+    if (isShown < totalHits) {
+      refs.loadMoreBtn.classList.remove('is-hidden');
+    }
+
+    const { height: cardHeight } = document
+      .querySelector(".gallery")
+      .firstElementChild.getBoundingClientRect();
 
     window.scrollBy({
-        top: cardHeight * 2,
-        behavior: "smooth",
+      top: cardHeight * 2,
+      behavior: "smooth",
     });
-    initLightbox();
-  });
+  }
 }
+
 
 function onRenderGallery(elements) {
   const markup = elements
