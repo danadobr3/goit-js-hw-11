@@ -49,24 +49,26 @@ async function fetchGallery() {
     const { totalHits } = result;
     hits = result.hits;
 
-    
+    isShown += hits.length;
     
     if (!hits.length) {
         Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
         refs.loadMoreBtn.classList.add('is-hidden');
-        return;
+        return result;
     }
     
     onRenderGallery(hits);
+    isShown += hits.length;
 
+    if (isShown < totalHits) {
+        Notify.success(`Hooray! We found ${totalHits} images !!!`);
+        refs.loadMoreBtn.classList.remove('is-hidden');
+    }
 
-   if (isShown < totalHits) {
-    Notify.success(`Hooray! We found ${totalHits} images !!!`);
-    refs.loadMoreBtn.classList.remove('is-hidden');
-  } else {
-    Notify.info("We're sorry, but you've reached the end of search results.");
-   }
-    
+    if (isShown >= totalHits) {
+        Notify.info("We're sorry, but you've reached the end of search results.");
+    }
+    return result;
 }
 
 function onLoadMore() {
@@ -75,7 +77,7 @@ function onLoadMore() {
     const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
 
     window.scrollBy({
-        top: cardHeight * 2,
+        top: cardHeight,
         behavior: "smooth",
     });
       initLightbox();
@@ -124,3 +126,6 @@ function onRenderGallery(elements) {
   lightbox.refresh();
 }
 
+function initLightbox() {
+  lightbox.refresh();
+}
