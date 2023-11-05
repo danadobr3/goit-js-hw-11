@@ -37,9 +37,11 @@ const observer = new IntersectionObserver(onLoadMore, options);
         return;
     }
 
-    isShown = 0;
-  fetchGallery();
-  onRenderGallery(hits);
+  isShown = 0;
+  refs.loadMoreBtn.classList.add('is-hidden');
+  fetchGallery().then(() => {
+    onRenderGallery(hits);
+  });
 }
 
 async function fetchGallery() {
@@ -72,21 +74,17 @@ async function fetchGallery() {
 }
 
 function onLoadMore() {
-  if (!refs.loadMoreBtn.classList.contains('is-hidden')) {
-    newsApiSearch.incrementPage();
-    fetchGallery().then(result => {
-      const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
-
-      window.scrollBy({
-        top: cardHeight,
-        behavior: "smooth",
-      });
-      initLightbox();
+  newsApiSearch.incrementPage();
+  fetchGallery().then(() =>  {
+  onRenderGallery(hits);
+    const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: "smooth",
     });
-    }
-  }
-
-
+    initLightbox();
+  });
+}
 
 function onRenderGallery(elements) {
   const markup = elements
