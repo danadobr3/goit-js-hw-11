@@ -13,6 +13,7 @@ const refs = {
 
 let isShown = 0;
 const newsApiSearch = new NewsApiSearch();
+let currentPage = 1;
 
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
@@ -30,7 +31,8 @@ const observer = new IntersectionObserver(onLoadMore, options);
     
     refs.gallery.innerHTML = '';
     newsApiSearch.query = event.currentTarget.elements.searchQuery.value.trim();
-    newsApiSearch.resetPage();
+   newsApiSearch.resetPage();
+   currentPage = 1;
 
     if (newsApiSearch.query === '') {
         Notify.failure(`Please, fill the main field`);
@@ -45,20 +47,17 @@ const observer = new IntersectionObserver(onLoadMore, options);
 async function fetchGallery() {
     refs.loadMoreBtn.classList.add('is-hidden');
     
-    const result = await newsApiSearch.fetchGallery();
-    const { totalHits } = result;
-    hits = result.hits;
-
-    isShown += hits.length;
+  const result = await newsApiSearch.fetchGallery(currentPage);
+  const { totalHits, hits: newHits } = result;
     
-    if (!hits.length) {
+    if (newHits.length === 0) {
         Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
         refs.loadMoreBtn.classList.add('is-hidden');
         return result;
     }
     
-    onRenderGallery(hits);
-    isShown += hits.length;
+     hits = [...hits, ...newHits];
+    isShown += newHits.length;
 
     if (isShown < totalHits) {
         Notify.success(`Hooray! We found ${totalHits} images !!!`);
@@ -68,6 +67,7 @@ async function fetchGallery() {
     if (isShown >= totalHits) {
         Notify.info("We're sorry, but you've reached the end of search results.");
     }
+  currentPage++;
     return result;
 }
 
@@ -77,7 +77,7 @@ function onLoadMore() {
     const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
 
     window.scrollBy({
-        top: cardHeight,
+        top: cardHeight * 2,
         behavior: "smooth",
     });
       initLightbox();
