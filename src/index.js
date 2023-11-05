@@ -26,62 +26,64 @@ const options = {
 
 const observer = new IntersectionObserver(onLoadMore, options);
 
- function onSearch(event) {
-    event.preventDefault();
-    
-    refs.gallery.innerHTML = '';
-    newsApiSearch.query = event.currentTarget.elements.searchQuery.value.trim();
-   newsApiSearch.resetPage();
-   currentPage = 1;
+function onSearch(event) {
+  event.preventDefault();
 
-    if (newsApiSearch.query === '') {
-        Notify.failure(`Please, fill the main field`);
-        return;
-    }
+  refs.gallery.innerHTML = '';
+  newsApiSearch.query = event.currentTarget.elements.searchQuery.value.trim();
+  newsApiSearch.resetPage();
+  currentPage = 1;
 
-    isShown = 0;
+  if (newsApiSearch.query === '') {
+    Notify.failure(`Please, fill the main field`);
+    return;
+  }
+
+  isShown = 0;
   fetchGallery();
   onRenderGallery(hits);
 }
 
 async function fetchGallery() {
-    refs.loadMoreBtn.classList.add('is-hidden');
-    
+  refs.loadMoreBtn.classList.add('is-hidden');
+
   const result = await newsApiSearch.fetchGallery(currentPage);
   const { totalHits, hits: newHits } = result;
-    
-    if (newHits.length === 0) {
-        Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
-        refs.loadMoreBtn.classList.add('is-hidden');
-        return result;
-    }
-    
-     hits = [...hits, ...newHits];
-    isShown += newHits.length;
 
-    if (isShown < totalHits) {
-        Notify.success(`Hooray! We found ${totalHits} images !!!`);
-        refs.loadMoreBtn.classList.remove('is-hidden');
-    }
-
-    if (isShown >= totalHits) {
-        Notify.info("We're sorry, but you've reached the end of search results.");
-    }
-  currentPage++;
+  if (newHits.length === 0) {
+    Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
+    refs.loadMoreBtn.classList.add('is-hidden');
     return result;
+  }
+
+  hits = [...hits, ...newHits];
+  isShown += newHits.length;
+
+  if (isShown < totalHits) {
+    Notify.success(`Hooray! We found ${totalHits} images !!!`);
+    refs.loadMoreBtn.classList.remove('is-hidden');
+  }
+
+  if (isShown >= totalHits) {
+    Notify.info("We're sorry, but you've reached the end of search results.");
+  }
+  currentPage++;
+  return result;
 }
 
-function onLoadMore() {
-  newsApiSearch.incrementPage();
-  fetchGallery().then(result => {
-    const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
+function onLoadMore(entries) {
+  const target = entries[0];
+  if (target.isIntersecting) {
+    fetchGallery().then(result => {
+      const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
 
-    window.scrollBy({
+      window.scrollBy({
         top: cardHeight * 2,
         behavior: "smooth",
-    });
+      });
       initLightbox();
-  });
+    });
+  }
 }
 
 function onRenderGallery(elements) {
@@ -129,3 +131,5 @@ function onRenderGallery(elements) {
 function initLightbox() {
   lightbox.refresh();
 }
+
+observer.observe(refs.loadMoreBtn);
