@@ -23,7 +23,7 @@ const options = {
   threshold: 0.3,
 };
 
-const observer = new IntersectionObserver(onLoadMore, options);
+
 
  function onSearch(event) {
     event.preventDefault();
@@ -37,11 +37,10 @@ const observer = new IntersectionObserver(onLoadMore, options);
         return;
     }
 
-  isShown = 0;
-  refs.loadMoreBtn.classList.add('is-hidden');
-  fetchGallery().then(() => {
-    onRenderGallery(hits);
-  });
+    isShown = 0;
+  fetchGallery();
+   onRenderGallery(hits);
+   
 }
 
 async function fetchGallery() {
@@ -75,12 +74,13 @@ async function fetchGallery() {
 
 function onLoadMore() {
   newsApiSearch.incrementPage();
-  fetchGallery().then(() =>  {
-  onRenderGallery(hits);
+  fetchGallery().then(() => {
+    onRenderGallery(hits);
     const { height: cardHeight } = document.querySelector(".gallery").lastElementChild.getBoundingClientRect();
+
     window.scrollBy({
-      top: cardHeight * 2,
-      behavior: "smooth",
+        top: cardHeight * 2,
+        behavior: "smooth",
     });
     initLightbox();
   });
