@@ -12,6 +12,7 @@ const refs = {
 };
 
 let isShown = 0;
+let isLoading = false; 
 const newsApiSearch = new NewsApiSearch();
 
 refs.searchForm.addEventListener('submit', onSearch);
@@ -41,7 +42,7 @@ async function onSearch(event) {
   isShown = 0;
   fetchGallery();
   onRenderGallery(hits);
-  
+
 }
 
 async function fetchGallery() {
@@ -74,8 +75,14 @@ async function fetchGallery() {
 }
 
 async function loadMoreImages() {
+  if (isLoading) {
+    return;
+  }
+
+  isLoading = true;
   const result = await fetchGallery();
   const { totalHits } = result;
+  isLoading = false;
 
   if (isShown < totalHits) {
     refs.loadMoreBtn.classList.add('is-hidden');
