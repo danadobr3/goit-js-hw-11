@@ -18,14 +18,6 @@ refs.searchForm.addEventListener('submit', onSearch);
 
 refs.loadMoreBtn.addEventListener('click', loadMoreImages);
 
-const options = {
-  rootMargin: '50px',
-  root: null,
-  threshold: 0.3,
-};
-
-const observer = new IntersectionObserver(loadMoreImages, options);
-
 async function onSearch(event) {
   event.preventDefault();
 
@@ -40,8 +32,6 @@ async function onSearch(event) {
 
   isShown = 0;
   fetchGallery();
-  onRenderGallery(hits);
-  
 }
 
 async function fetchGallery() {
@@ -70,32 +60,13 @@ async function fetchGallery() {
   if (isShown >= totalHits) {
     Notify.info("We're sorry, but you've reached the end of search results.");
   }
-  return result;
 }
 
 async function loadMoreImages() {
-  const result = await fetchGallery();
-  const { totalHits } = result;
 
-  if (isShown < totalHits) {
-    refs.loadMoreBtn.classList.add('is-hidden');
-    isShown += result.hits.length;
-    if (isShown < totalHits) {
-      refs.loadMoreBtn.classList.remove('is-hidden');
-    }
+  newsApiSearch.incrementPage();
+  fetchGallery();
 
-    newsApiSearch.incrementPage(); 
-
-    const { height: cardHeight } = document
-      .querySelector(".gallery")
-      .firstElementChild.getBoundingClientRect();
-
-    
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: "smooth",
-    });
-  }
 }
 
 
