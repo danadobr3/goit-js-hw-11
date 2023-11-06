@@ -27,7 +27,6 @@ export default class NewsApiSearch {
 
             const data = response.data;
 
-            this.incrementPage();
             return data;
         } catch (error) {
             console.error(error);
